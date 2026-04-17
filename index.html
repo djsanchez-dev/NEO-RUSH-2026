@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#04000f">
+  <title>NEON RUNNER 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/ui/styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- SCREEN: BOOT -->
+    <div id="screen-boot" class="screen active">
+      <div class="boot-scan"></div>
+      <div class="boot-logo">
+        <div class="logo-glitch" data-text="NEON RUNNER">NEON RUNNER</div>
+        <div class="logo-year">2 0 2 6</div>
+        <div class="boot-bar-container">
+          <div class="boot-bar" id="bootBar"></div>
+          <div class="boot-status" id="bootStatus">INICIANDO SISTEMAS...</div>
+        </div>
+      </div>
+      <div class="boot-lines" id="bootLines"></div>
+    </div>
+
+    <!-- SCREEN: MENU -->
+    <div id="screen-menu" class="screen">
+      <div class="menu-bg">
+        <canvas id="menuParticles"></canvas>
+      </div>
+      <div class="menu-content">
+        <div class="menu-logo">
+          <div class="logo-line1">NEON</div>
+          <div class="logo-line2">RUNNER</div>
+          <div class="logo-tag">// CYBERPUNK EDITION 2026</div>
+        </div>
+        <div class="menu-nav">
+          <button class="menu-btn primary" id="btnPlay">
+            <span class="btn-icon">▶</span>
+            <span class="btn-text">JUGAR</span>
+            <span class="btn-hint">INICIAR PARTIDA</span>
+          </button>
+          <button class="menu-btn" id="btnStory">
+            <span class="btn-icon">◈</span>
+            <span class="btn-text">HISTORIA</span>
+            <span class="btn-hint">LORE DEL MUNDO</span>
+          </button>
+          <button class="menu-btn" id="btnRecords">
+            <span class="btn-icon">◆</span>
+            <span class="btn-text">RECORDS</span>
+            <span class="btn-hint">MEJORES PUNTUACIONES</span>
+          </button>
+          <button class="menu-btn" id="btnSettings">
+            <span class="btn-icon">⚙</span>
+            <span class="btn-text">OPCIONES</span>
+            <span class="btn-hint">AUDIO · VIDEO · CONTROLES</span>
+          </button>
+        </div>
+        <div class="menu-footer">
+          <span class="hiscore-label">MEJOR PUNTUACIÓN</span>
+          <span class="hiscore-val" id="menuHiscore">000000</span>
+        </div>
+      </div>
+      <div class="menu-runner-preview">
+        <canvas id="runnerPreview" width="120" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- SCREEN: STORY -->
+    <div id="screen-story" class="screen">
+      <div class="story-container">
+        <div class="story-header">// ARCHIVO CLASIFICADO — NEO-CIUDAD 2026</div>
+        <div class="story-text">
+          <p>El sistema NEXUS controla todo. Cada dato, cada movimiento, cada pensamiento filtrado por sus servidores.</p>
+          <p>Tú eres <span class="highlight">CIPHER</span> — el único runner capaz de moverse entre las grietas del código, esquivando centinelas de datos y recolectando fragmentos de verdad.</p>
+          <p>La misión: llegar al nodo central y liberar la señal que despertará a la ciudad dormida.</p>
+          <p class="story-mission">// OBJETIVO: SUPERA EL NIVEL 10 · DISTANCIA: ∞ · PROBABILIDAD DE ÉXITO: 0.7%</p>
+        </div>
+        <button class="story-back" id="btnStoryBack">← VOLVER</button>
+      </div>
+    </div>
+
+    <!-- SCREEN: RECORDS -->
+    <div id="screen-records" class="screen">
+      <div class="records-container">
+        <div class="records-title">// TABLA DE LÍDERES</div>
+        <div class="records-list" id="recordsList"></div>
+        <button class="story-back" id="btnRecordsBack">← VOLVER</button>
+      </div>
+    </div>
+
+    <!-- SCREEN: SETTINGS -->
+    <div id="screen-settings" class="screen">
+      <div class="settings-container">
+        <div class="settings-title">// CONFIGURACIÓN DEL SISTEMA</div>
+        <div class="settings-grid">
+          <div class="setting-row">
+            <label>MÚSICA</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="toggleMusic">ON</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label>EFECTOS SFX</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="toggleSFX">ON</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label>VOLUMEN MÚSICA</label>
+            <input type="range" min="0" max="100" value="60" id="volMusic" class="neon-range">
+          </div>
+          <div class="setting-row">
+            <label>VOLUMEN SFX</label>
+            <input type="range" min="0" max="100" value="80" id="volSFX" class="neon-range">
+          </div>
+          <div class="setting-row">
+            <label>PARTÍCULAS</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="toggleParticles">ALTA</button>
+            </div>
+          </div>
+          <div class="setting-row">
+            <label>VIBRACION MÓVIL</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="toggleVibration">ON</button>
+            </div>
+          </div>
+        </div>
+        <button class="story-back" id="btnSettingsBack">← VOLVER</button>
+      </div>
+    </div>
+
+    <!-- SCREEN: GAME -->
+    <div id="screen-game" class="screen">
+      <div id="gameHUD">
+        <div class="hud-left">
+          <div class="hud-score">
+            <div class="hud-label">PUNTOS</div>
+            <div class="hud-val" id="hudScore">000000</div>
+          </div>
+          <div class="hud-level">
+            <div class="hud-label">NIVEL</div>
+            <div class="hud-val" id="hudLevel">01</div>
+          </div>
+        </div>
+        <div class="hud-center">
+          <div class="combo-display" id="comboDisplay"></div>
+          <div class="power-display" id="powerDisplay"></div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-lives">
+            <div class="hud-label">VIDAS</div>
+            <div class="lives-icons" id="livesIcons">
+              <span class="life-icon active">◆</span>
+              <span class="life-icon active">◆</span>
+              <span class="life-icon active">◆</span>
+            </div>
+          </div>
+          <div class="hud-dash">
+            <div class="hud-label">DASH</div>
+            <div class="dash-bar-wrap">
+              <div class="dash-bar" id="dashBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <canvas id="gameCanvas"></canvas>
+      <div id="mobileControls">
+        <div class="ctrl-left">
+          <button class="ctrl-btn" id="btnLeft" aria-label="Izquierda">◀</button>
+          <button class="ctrl-btn" id="btnRight" aria-label="Derecha">▶</button>
+        </div>
+        <div class="ctrl-right">
+          <button class="ctrl-btn jump" id="btnJump" aria-label="Saltar">▲</button>
+          <button class="ctrl-btn dash" id="btnDash" aria-label="Dash">⚡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: PAUSE -->
+    <div id="screen-pause" class="screen overlay-screen">
+      <div class="pause-panel">
+        <div class="pause-title">// PAUSA</div>
+        <button class="menu-btn" id="btnResume"><span class="btn-icon">▶</span><span class="btn-text">CONTINUAR</span></button>
+        <button class="menu-btn" id="btnPauseRestart"><span class="btn-icon">↺</span><span class="btn-text">REINICIAR</span></button>
+        <button class="menu-btn" id="btnPauseMenu"><span class="btn-icon">⌂</span><span class="btn-text">MENÚ</span></button>
+      </div>
+    </div>
+
+    <!-- SCREEN: GAME OVER -->
+    <div id="screen-gameover" class="screen overlay-screen">
+      <div class="gameover-panel">
+        <div class="gameover-title" id="gameoverTitle">SISTEMA CAÍDO</div>
+        <div class="gameover-subtitle" id="gameoverSub">CIPHER HA SIDO ELIMINADO</div>
+        <div class="results-grid">
+          <div class="result-item">
+            <div class="result-label">PUNTOS</div>
+            <div class="result-val" id="goScore">000000</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">MEJOR</div>
+            <div class="result-val" id="goHiscore">000000</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">NIVEL</div>
+            <div class="result-val" id="goLevel">01</div>
+          </div>
+          <div class="result-item">
+            <div class="result-label">COMBO MAX</div>
+            <div class="result-val" id="goCombo">x1</div>
+          </div>
+        </div>
+        <div class="new-record-badge" id="newRecordBadge" style="display:none">¡ NUEVO RÉCORD !</div>
+        <div class="gameover-btns">
+          <button class="menu-btn primary" id="btnRetry"><span class="btn-icon">↺</span><span class="btn-text">REINTENTAR</span></button>
+          <button class="menu-btn" id="btnGoMenu"><span class="btn-icon">⌂</span><span class="btn-text">MENÚ</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: LEVEL UP -->
+    <div id="screen-levelup" class="screen overlay-screen" style="pointer-events:none">
+      <div class="levelup-blast" id="levelupBlast"></div>
+    </div>
+
+  </div>
+
+  <!-- Scripts in order -->
+  <script src="src/audio/AudioEngine.js"></script>
+  <script src="src/engine/Utils.js"></script>
+  <script src="src/engine/Particles.js"></script>
+  <script src="src/engine/Camera.js"></script>
+  <script src="src/entities/Player.js"></script>
+  <script src="src/entities/Obstacle.js"></script>
+  <script src="src/entities/Collectible.js"></script>
+  <script src="src/systems/GameWorld.js"></script>
+  <script src="src/systems/Renderer.js"></script>
+  <script src="src/ui/ScreenManager.js"></script>
+  <script src="src/ui/MenuAnimations.js"></script>
+  <script src="src/engine/GameLoop.js"></script>
+  <script src="src/engine/InputManager.js"></script>
+  <script src="src/engine/Main.js"></script>
+</body>
+</html>
