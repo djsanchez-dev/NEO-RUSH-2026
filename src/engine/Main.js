@@ -308,14 +308,21 @@ class NeonRunnerGame {
 
   _showLevelUp(level) {
     const el = document.getElementById('levelupBlast');
-    const screen = document.getElementById('screen-levelup');
-    if (!el || !screen) return;
+    if (!el) return;
+    // Show a transient, non-obstructive blast label instead of a full overlay
     el.textContent = `NIVEL ${level}`;
-    el.style.animation = 'none';
+    // Use CSS class toggle for animation; avoid toggling the screen overlay
+    el.classList.remove('levelup-animate');
+    // Force reflow to restart animation
     void el.offsetWidth;
-    el.style.animation = '';
-    screen.classList.add('active');
-    setTimeout(() => screen.classList.remove('active'), 1600);
+    el.classList.add('levelup-animate');
+    // Activate parent screen briefly so animation is visible (we made the
+    // overlay transparent in CSS to avoid blocking gameplay)
+    const screen = document.getElementById('screen-levelup');
+    if (screen) {
+      screen.classList.add('active');
+      setTimeout(() => screen.classList.remove('active'), 1400);
+    }
   }
 
   _showGameOver() {

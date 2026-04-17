@@ -24,7 +24,10 @@ class GameWorld {
     this.distance = 0;
     this.obstacles = [];
     this.collectibles = [];
-    this.particles = new ParticleSystem(500);
+    // Limit particles on touch devices to preserve mobile performance
+    const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const maxParticles = isTouch ? 220 : 500;
+    this.particles = new ParticleSystem(maxParticles);
     this.player = new Player(80, this.GROUND_Y - 30);
     this.powerup = null; // active powerup
     this.powerupTimer = 0;

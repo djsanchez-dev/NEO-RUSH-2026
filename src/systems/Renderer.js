@@ -75,6 +75,31 @@ class Renderer {
     this._drawScanlines(ctx, W, H);
     // Vignette
     this._drawVignette(ctx, W, H);
+
+    // Debug overlay: hitboxes and FPS
+    try {
+      if (window.DEBUG) {
+        ctx.save();
+        // Obstacles hitboxes
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255,60,60,0.95)';
+        world.obstacles.forEach(o => {
+          const boxes = o.getHitBoxes();
+          boxes.forEach(b => ctx.strokeRect(b.x, b.y, b.w, b.h));
+        });
+        // Player hitbox
+        const ph = world.player.hitBox;
+        ctx.strokeStyle = 'rgba(60,255,120,0.95)';
+        ctx.strokeRect(ph.x, ph.y, ph.w, ph.h);
+
+        // FPS
+        const fps = (window.game && window.game.loop) ? window.game.loop.fps : 0;
+        ctx.font = "12px 'Share Tech Mono', monospace";
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.fillText('FPS: ' + fps, 8, 16);
+        ctx.restore();
+      }
+    } catch (e) { /* fail silently in prod */ }
   }
 
   _drawBG(ctx, W, H, world) {

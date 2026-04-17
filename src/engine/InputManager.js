@@ -53,6 +53,14 @@ class InputManager {
 
   _bind() {
     document.addEventListener('keydown', e => {
+      // Toggle debug mode (F3 or backtick) for QA
+      if (e.key === 'F3' || e.key === '`') {
+        window.DEBUG = !window.DEBUG;
+        console.info('DEBUG mode:', window.DEBUG);
+        e.preventDefault();
+        return;
+      }
+
       this.keys[e.key] = true;
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
       if (['ArrowUp','w','W',' '].includes(e.key)) this.jumpPressed = true;
