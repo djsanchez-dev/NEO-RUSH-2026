@@ -1,40 +1,66 @@
+/**
+ * InputManager — Keyboard + Multi-touch support
+ * Handles simultaneous button presses (move + jump + dash at the same time)
+ */
 class InputManager {
   constructor() {
     this.keys = {};
     this.jumpPressed = false;
     this.dashPressed = false;
+    this._touchMap = {};
+    this._btnState = {};
     this._bind();
   }
 
-  get left()  { return !!(this.keys['ArrowLeft']  || this.keys['a'] || this.keys['A']); }
-  get right() { return !!(this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']); }
+  get left()  { return !!(this.keys['ArrowLeft']  || this.keys['a'] || this.keys['A'] || this._btnState['btnLeft']); }
+  get right() { return !!(this.keys['ArrowRight'] || this.keys['d'] || this.keys['D'] || this._btnState['btnRight']); }
+
+  _setBtn(id, val) {
+    this._btnState[id] = val;
+    if (id === 'btnJump'  && val) this.jumpPressed = true;
+    if (id === 'btnDash'  && val) this.dashPressed = true;
+    if (id === 'btnPause' && val) window.game?.togglePause();
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('pressed', val);
+  }
+
+  _bindBtn(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener('touchstart', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      for (const t of e.changedTouches) this._touchMap[t.identifier] = id;
+      this._setBtn(id, true);
+    }, { passive: false });
+
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      for (const t of e.changedTouches) delete this._touchMap[t.identifier];
+      if (!Object.values(this._touchMap).includes(id)) this._setBtn(id, false);
+    }, { passive: false });
+
+    el.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      for (const t of e.changedTouches) delete this._touchMap[t.identifier];
+      if (!Object.values(this._touchMap).includes(id)) this._setBtn(id, false);
+    }, { passive: false });
+
+    el.addEventListener('mousedown',  (e) => { e.preventDefault(); this._setBtn(id, true); });
+    el.addEventListener('mouseup',    (e) => { e.preventDefault(); this._setBtn(id, false); });
+    el.addEventListener('mouseleave', ()  => { this._setBtn(id, false); });
+  }
 
   _bind() {
     document.addEventListener('keydown', e => {
       this.keys[e.key] = true;
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
-      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') this.jumpPressed = true;
-      if (e.key === 'Shift' || e.key === 'x' || e.key === 'X') this.dashPressed = true;
-      if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') window.game?.togglePause();
+      if (['ArrowUp','w','W',' '].includes(e.key)) this.jumpPressed = true;
+      if (['Shift','x','X'].includes(e.key)) this.dashPressed = true;
+      if (['Escape','p','P'].includes(e.key)) window.game?.togglePause();
     });
     document.addEventListener('keyup', e => { this.keys[e.key] = false; });
-
-    // Mobile buttons
-    const addBtn = (id, onDown, onUp) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const d = (ev) => { ev.preventDefault(); onDown(); };
-      const u = (ev) => { ev.preventDefault(); if (onUp) onUp(); };
-      el.addEventListener('touchstart', d, { passive: false });
-      el.addEventListener('touchend', u, { passive: false });
-      el.addEventListener('mousedown', d);
-      el.addEventListener('mouseup', u);
-    };
-
-    addBtn('btnLeft',  () => this.keys['ArrowLeft']  = true, () => this.keys['ArrowLeft']  = false);
-    addBtn('btnRight', () => this.keys['ArrowRight'] = true, () => this.keys['ArrowRight'] = false);
-    addBtn('btnJump',  () => { this.keys['ArrowUp'] = true; this.jumpPressed = true; }, () => this.keys['ArrowUp'] = false);
-    addBtn('btnDash',  () => { this.dashPressed = true; });
+    ['btnLeft','btnRight','btnJump','btnDash','btnPause'].forEach(id => this._bindBtn(id));
   }
 
   consume() {

@@ -23,26 +23,43 @@ class NeonRunnerGame {
     this._bindGameButtons();
     this._bindSettingsButtons();
     this._resizeCanvas();
+    // Resize on orientation change and window resize
     window.addEventListener('resize', () => this._resizeCanvas());
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => this._resizeCanvas(), 300);
+    });
+    // Block scroll on canvas only (not menus)
+    document.getElementById('gameCanvas')?.addEventListener('touchmove',
+      e => e.preventDefault(), { passive: false });
   }
 
   _resizeCanvas() {
     if (!this.canvas) return;
-    const parent = this.canvas.parentElement;
-    if (!parent) return;
-    const parentH = parent.clientHeight;
+    // Use actual viewport size accounting for mobile browser chrome
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Measure HUD and controls height after they're rendered
     const hud = document.getElementById('gameHUD');
     const ctrl = document.getElementById('mobileControls');
-    const hudH = hud ? hud.offsetHeight : 60;
-    const ctrlH = (ctrl && getComputedStyle(ctrl).display !== 'none') ? ctrl.offsetHeight : 0;
-    const availH = parentH - hudH - ctrlH;
-    const W = parent.clientWidth;
-    const H = Math.max(200, availH);
-    this.canvas.width = W;
-    this.canvas.height = H;
+
+    // Only count control height if it's visible (touch device)
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+    const hudH  = hud  ? hud.getBoundingClientRect().height  : 52;
+    const ctrlH = (isTouchDevice && ctrl) ? ctrl.getBoundingClientRect().height : 0;
+
+    const canvasH = Math.max(120, Math.floor(vh - hudH - ctrlH));
+    const canvasW = Math.floor(vw);
+
+    this.canvas.width  = canvasW;
+    this.canvas.height = canvasH;
+
     if (this.world) {
-      this.world.W = W; this.world.H = H;
-      this.world.player.y = Math.min(this.world.player.y, this.world.GROUND_Y - this.world.player.h);
+      this.world.W = canvasW;
+      this.world.H = canvasH;
+      // Keep player on new ground
+      const newGround = this.world.GROUND_Y - this.world.player.h;
+      if (this.world.player.y > newGround) this.world.player.y = newGround;
     }
   }
 
@@ -206,18 +223,22 @@ class NeonRunnerGame {
 
   _startGame() {
     this.menuAnim.stopMenu();
-    this._resizeCanvas();
-    this.world = new GameWorld(this.canvas);
-    this.renderer = new Renderer(this.canvas);
-    this.world.start();
     this.screens.show('game');
 
-    if (this.loop) this.loop.stop();
-    this.loop = new GameLoop(
-      () => this._update(),
-      () => this._render()
-    );
-    this.loop.start();
+    // Resize after screen is shown so HUD and controls are in layout
+    requestAnimationFrame(() => {
+      this._resizeCanvas();
+      this.world = new GameWorld(this.canvas);
+      this.renderer = new Renderer(this.canvas);
+      this.world.start();
+
+      if (this.loop) this.loop.stop();
+      this.loop = new GameLoop(
+        () => this._update(),
+        () => this._render()
+      );
+      this.loop.start();
+    });
   }
 
   _update() {

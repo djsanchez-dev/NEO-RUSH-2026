@@ -2,8 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#04000f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>NEON RUNNER 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -171,13 +174,25 @@
       </div>
       <canvas id="gameCanvas"></canvas>
       <div id="mobileControls">
-        <div class="ctrl-left">
-          <button class="ctrl-btn" id="btnLeft" aria-label="Izquierda">◀</button>
-          <button class="ctrl-btn" id="btnRight" aria-label="Derecha">▶</button>
+        <div class="ctrl-dpad">
+          <button class="ctrl-btn" id="btnLeft" aria-label="Izquierda">
+            ◀
+            <span class="ctrl-btn-label">IZQ</span>
+          </button>
+          <button class="ctrl-btn" id="btnRight" aria-label="Derecha">
+            ▶
+            <span class="ctrl-btn-label">DER</span>
+          </button>
         </div>
-        <div class="ctrl-right">
+        <div style="display:flex;align-items:center;justify-content:center;flex:1">
+          <button id="btnPause" aria-label="Pausa">II</button>
+        </div>
+        <div class="ctrl-actions">
+          <button class="ctrl-btn dash" id="btnDash" aria-label="Dash">
+            ⚡
+            <span class="ctrl-btn-label">DASH</span>
+          </button>
           <button class="ctrl-btn jump" id="btnJump" aria-label="Saltar">▲</button>
-          <button class="ctrl-btn dash" id="btnDash" aria-label="Dash">⚡</button>
         </div>
       </div>
     </div>
